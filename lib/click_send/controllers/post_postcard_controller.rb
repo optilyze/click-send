@@ -4,9 +4,9 @@
 # ( https://apimatic.io ).
 
 module ClickSend
-  # ResellerAccountController
-  class ResellerAccountController < BaseController
-    @instance = ResellerAccountController.new
+  # PostPostcardController
+  class PostPostcardController < BaseController
+    @instance = PostPostcardController.new
 
     class << self
       attr_accessor :instance
@@ -16,41 +16,18 @@ module ClickSend
       self.class.instance
     end
 
-    # Get list of reseller accounts
+    # Send one or more postcards
+    # @param [PostPostcard] post_postcards Required parameter: PostPostcard
+    # model
     # @return String response from the API call
-    def get_reseller_accounts
-      # Prepare query url.
-      _query_builder = Configuration.base_uri.dup
-      _query_builder << '/reseller/accounts'
-      _query_url = APIHelper.clean_url _query_builder
-
-      # Prepare and execute HttpRequest.
-      _request = @http_client.get(
-        _query_url
-      )
-      BasicAuth.apply(_request)
-      _context = execute_request(_request)
-
-      # Validate response against endpoint and global error codes.
-      return nil if _context.response.status_code == 404
-      validate_response(_context)
-
-      # Return appropriate response type.
-      _context.response.raw_body
-    end
-
-    # Create reseller account
-    # @param [ResellerAccount] reseller_account Required parameter:
-    # ResellerAccount model
-    # @return String response from the API call
-    def create_reseller_account(reseller_account)
+    def send_postcard(post_postcards)
       # Validate required parameters.
       validate_parameters(
-        'reseller_account' => reseller_account
+        'post_postcards' => post_postcards
       )
       # Prepare query url.
       _query_builder = Configuration.base_uri.dup
-      _query_builder << '/reseller/accounts'
+      _query_builder << '/post/postcards/send'
       _query_url = APIHelper.clean_url _query_builder
 
       # Prepare headers.
@@ -62,7 +39,7 @@ module ClickSend
       _request = @http_client.post(
         _query_url,
         headers: _headers,
-        parameters: reseller_account.to_json
+        parameters: post_postcards.to_json
       )
       BasicAuth.apply(_request)
       _context = execute_request(_request)
@@ -75,21 +52,48 @@ module ClickSend
       _context.response.raw_body
     end
 
-    # Get Reseller Account
-    # @param [Integer] client_user_id Required parameter: User ID of client
+    # Calculate price for sending one or more postcards
+    # @param [PostPostcard] post_postcards Required parameter: PostPostcard
+    # model
     # @return String response from the API call
-    def get_reseller_account(client_user_id)
+    def calculate_price(post_postcards)
       # Validate required parameters.
       validate_parameters(
-        'client_user_id' => client_user_id
+        'post_postcards' => post_postcards
       )
       # Prepare query url.
       _query_builder = Configuration.base_uri.dup
-      _query_builder << '/reseller/accounts/{client_user_id}'
-      _query_builder = APIHelper.append_url_with_template_parameters(
-        _query_builder,
-        'client_user_id' => client_user_id
+      _query_builder << '/post/postcards/price'
+      _query_url = APIHelper.clean_url _query_builder
+
+      # Prepare headers.
+      _headers = {
+        'content-type' => 'application/json; charset=utf-8'
+      }
+
+      # Prepare and execute HttpRequest.
+      _request = @http_client.post(
+        _query_url,
+        headers: _headers,
+        parameters: post_postcards.to_json
       )
+      BasicAuth.apply(_request)
+      _context = execute_request(_request)
+
+      # Validate response against endpoint and global error codes.
+      return nil if _context.response.status_code == 404
+      validate_response(_context)
+
+      # Return appropriate response type.
+      _context.response.raw_body
+    end
+
+    # Retrieve the history of postcards sent or scheduled
+    # @return String response from the API call
+    def get_postcard_history
+      # Prepare query url.
+      _query_builder = Configuration.base_uri.dup
+      _query_builder << '/post/postcards/history'
       _query_url = APIHelper.clean_url _query_builder
 
       # Prepare and execute HttpRequest.
@@ -107,37 +111,29 @@ module ClickSend
       _context.response.raw_body
     end
 
-    # Reseller Account
-    # @param [Integer] client_user_id Required parameter: User ID of client
-    # @param [ResellerAccount] reseller_account Required parameter:
-    # ResellerAccount model
+    # Export postcard history to a CSV file
+    # @param [String] filename Required parameter: Filename to export to
     # @return String response from the API call
-    def update_reseller_account(client_user_id,
-                                reseller_account)
+    def export_postcard_history(filename)
       # Validate required parameters.
       validate_parameters(
-        'client_user_id' => client_user_id,
-        'reseller_account' => reseller_account
+        'filename' => filename
       )
       # Prepare query url.
       _query_builder = Configuration.base_uri.dup
-      _query_builder << '/reseller/accounts/{client_user_id}'
-      _query_builder = APIHelper.append_url_with_template_parameters(
+      _query_builder << '/post/postcards/history/export'
+      _query_builder = APIHelper.append_url_with_query_parameters(
         _query_builder,
-        'client_user_id' => client_user_id
+        {
+          'filename' => filename
+        },
+        array_serialization: Configuration.array_serialization
       )
       _query_url = APIHelper.clean_url _query_builder
 
-      # Prepare headers.
-      _headers = {
-        'content-type' => 'application/json; charset=utf-8'
-      }
-
       # Prepare and execute HttpRequest.
-      _request = @http_client.put(
-        _query_url,
-        headers: _headers,
-        parameters: reseller_account.to_json
+      _request = @http_client.get(
+        _query_url
       )
       BasicAuth.apply(_request)
       _context = execute_request(_request)

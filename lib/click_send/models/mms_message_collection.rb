@@ -4,20 +4,27 @@
 # ( https://apimatic.io ).
 
 module ClickSend
-  # Array of SmsMessage items
-  class SmsMessageCollection < BaseModel
-    # Array of SmsMessage items
-    # @return [List of SmsMessage]
+  # Array of MmsMessage items
+  class MmsMessageCollection < BaseModel
+    # Media file you want to send
+    # @return [String]
+    attr_accessor :media_file
+
+    # Array of MmsMessage models
+    # @return [List of MmsMessage]
     attr_accessor :messages
 
     # A mapping from model property names to API property names.
     def self.names
       @_hash = {} if @_hash.nil?
+      @_hash['media_file'] = 'media_file'
       @_hash['messages'] = 'messages'
       @_hash
     end
 
-    def initialize(messages = nil)
+    def initialize(media_file = nil,
+                   messages = nil)
+      @media_file = media_file
       @messages = messages
     end
 
@@ -26,17 +33,19 @@ module ClickSend
       return nil unless hash
 
       # Extract variables from the hash.
+      media_file = hash['media_file']
       # Parameter is an array, so we need to iterate through it
       messages = nil
       unless hash['messages'].nil?
         messages = []
         hash['messages'].each do |structure|
-          messages << (SmsMessage.from_hash(structure) if structure)
+          messages << (MmsMessage.from_hash(structure) if structure)
         end
       end
 
       # Create object from extracted values.
-      SmsMessageCollection.new(messages)
+      MmsMessageCollection.new(media_file,
+                               messages)
     end
   end
 end

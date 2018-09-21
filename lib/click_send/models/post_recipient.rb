@@ -4,35 +4,43 @@
 # ( https://apimatic.io ).
 
 module ClickSend
-  # Base model for all address-related objects.
-  class Address < BaseModel
-    # Your address name.
+  # PostRecipient model
+  class PostRecipient < BaseModel
+    # Name of address
     # @return [String]
     attr_accessor :address_name
 
-    # Your address line 1
+    # First line of address
     # @return [String]
     attr_accessor :address_line_1
 
-    # Your address line 2
+    # Second line of address
     # @return [String]
     attr_accessor :address_line_2
 
-    # Your city
+    # City
     # @return [String]
     attr_accessor :address_city
 
-    # Your state
+    # State
     # @return [String]
     attr_accessor :address_state
 
-    # Your postal code
+    # Postal code
     # @return [String]
     attr_accessor :address_postal_code
 
-    # Your country
+    # Country
     # @return [String]
     attr_accessor :address_country
+
+    # ID of return address to use
+    # @return [Integer]
+    attr_accessor :return_address_id
+
+    # When to send letter (0/null=now)
+    # @return [Integer]
+    attr_accessor :schedule
 
     # A mapping from model property names to API property names.
     def self.names
@@ -44,16 +52,20 @@ module ClickSend
       @_hash['address_state'] = 'address_state'
       @_hash['address_postal_code'] = 'address_postal_code'
       @_hash['address_country'] = 'address_country'
+      @_hash['return_address_id'] = 'return_address_id'
+      @_hash['schedule'] = 'schedule'
       @_hash
     end
 
     def initialize(address_name = nil,
                    address_line_1 = nil,
+                   address_line_2 = nil,
                    address_city = nil,
+                   address_state = nil,
                    address_postal_code = nil,
                    address_country = nil,
-                   address_line_2 = nil,
-                   address_state = nil)
+                   return_address_id = nil,
+                   schedule = 0)
       @address_name = address_name
       @address_line_1 = address_line_1
       @address_line_2 = address_line_2
@@ -61,6 +73,8 @@ module ClickSend
       @address_state = address_state
       @address_postal_code = address_postal_code
       @address_country = address_country
+      @return_address_id = return_address_id
+      @schedule = schedule
     end
 
     # Creates an instance of the object from a hash.
@@ -70,20 +84,24 @@ module ClickSend
       # Extract variables from the hash.
       address_name = hash['address_name']
       address_line_1 = hash['address_line_1']
+      address_line_2 = hash['address_line_2']
       address_city = hash['address_city']
+      address_state = hash['address_state']
       address_postal_code = hash['address_postal_code']
       address_country = hash['address_country']
-      address_line_2 = hash['address_line_2']
-      address_state = hash['address_state']
+      return_address_id = hash['return_address_id']
+      schedule = hash['schedule'] ||= 0
 
       # Create object from extracted values.
-      Address.new(address_name,
-                  address_line_1,
-                  address_city,
-                  address_postal_code,
-                  address_country,
-                  address_line_2,
-                  address_state)
+      PostRecipient.new(address_name,
+                        address_line_1,
+                        address_line_2,
+                        address_city,
+                        address_state,
+                        address_postal_code,
+                        address_country,
+                        return_address_id,
+                        schedule)
     end
   end
 end
