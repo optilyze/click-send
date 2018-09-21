@@ -30,7 +30,7 @@ module ClickSend
 
       # prepare form parameters	  
       _parameters = {
-        'content' => file,
+        'file' => file,
         'convert' => convert
       }
 
